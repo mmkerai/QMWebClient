@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TCC Quiz Master Gaming Setup New Game</title>
+    <link rel="stylesheet" type="text/css" href="css/form.css" media="Screen" />
+    <link rel="stylesheet" type="text/css" href="css/tccqmstyle.css" media="Screen" />
+	<script type="text/javascript" src="js/tcc_qm.js"></script>
+	<script type="text/javascript" src="js/tcc_qmcontestant.js"></script>
+	<script type="text/javascript" src="js/tcc_qmutils.js"></script>
+  </head>
+<body>
+<div id="header">
+<h1>Setup a new game</h1>
+</div>
+<div id="main">
+<form id="newgameform" action="/mpgame" method="POST">
+<table id="formtable">
+<tr><td>Game/event Name</td><td><input type="text" name="qmgname"/></td></tr>
+<tr><td>Category</td><td><select name="qmgcat" id="catoption" onchange="populateSubCat('catoption','scoption');"></select></td></tr>
+<tr><td>Subcategory</td><td><select name="qmgsubcat" id="scoption" onclick="populateDiff('scoption','diffoption');"></select></td></tr>
+<tr><td>Difficulty</td><td><select name="qmgdiff" id="diffoption"></select></td></tr>
+<tr><td>No. of questions</td><td><input type="text" name="qmgnumqu"/></td></tr>
+<!-- <tr><td>Time limit per question</td><td><input type="text" name="qmgtimelimit"/></td></tr>
+<tr><td>Questioning method</td><td><input type="text" name="qmgqumethod"/></td></tr> -->
+<tr><td colspan="2"><a href="#" onClick="AddGame()">Set up Game</a></td></tr>
+</table>
+</form>
+<div id="response"></div>
+</div>
+<script>
+SetupCategories();
+</script>
+<p><a href="showgames.html">Show my games</a></p>
+</body>
+</html>

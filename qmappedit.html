@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quiz Master Edit</title>
+    <link rel="stylesheet" type="text/css" href="css/form.css" media="Screen" />
+    <link rel="stylesheet" type="text/css" href="css/tccqmstyle.css" media="Screen" />
+	<script type="text/javascript" src="js/tcc_qm.js"></script>
+	<script type="text/javascript" src="js/tcc_qmapp.js"></script>
+	<script type="text/javascript" src="js/tcc_qmutils.js"></script>
+  </head>
+<body>
+<div id="wrapper">
+<div id="header">
+<h1 id="title">Edit Quizmaster</h1>
+</div>
+<form id="qmregisterform" class="inputform" method="POST">
+<input type="hidden" name="quizmasterid"/>
+<table id="contestantform">
+<tr><td>Quizmaster/event name</td><td><input type="text" name="qmname"/></td></tr>
+<tr><td>Password</td><td><input type="text" name="qmpassword"/></td></tr>
+<tr><td>Email</td><td><input type="text" name="qmemail"/></td></tr>
+<tr><td colspan="2"><a href='#' onClick='QMasterUpdate()'>Update</a></td></tr>
+</table>
+</form>
+<div id="response"></div>
+<script>
+GetQMEdit();
+</script>
+<p><a href=# onClick='window.close()'>Close this window</a></p>
+</div>
+</body>
+</html>
