@@ -237,7 +237,7 @@ function PopulateGamesTable(jsobj, gtable)
 	    var col8 = row.insertCell(6);
 	    col8.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"showcontestants.html\")'><img src='icons/contestants40.jpg' title='Manage contestants'/></a>";
 	    var col9 = row.insertCell(7);
-	    col9.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"reviewquestions.html\")'><img src='icons/question40.png' title='Review questions'/></a>";
+	    col9.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"reviewquestions.html\")'><img src='icons/questions40.png' title='Review questions'/></a>";
 	    var col10 = row.insertCell(8);
 	    col10.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"startgame.html\")'><img src='icons/start40.png' title='Start Game'/></a>";
 	    var col11 = row.insertCell(9);
@@ -944,3 +944,160 @@ function Logout()
 
 }
 
+/*
+ * Get all questions for a game and show them
+ */
+function ShowGameQuestions()
+{
+	var gameid = readCookie("QMGameID");
+	var response = doAjaxGet(GAME_URL+"/"+gameid+"/questions");
+//	alert(response);
+	var myobj = JSON.parse(response);
+	if(myobj.error != null)		// there was an error response
+	{
+		console.log(myobj.error.message);
+		document.getElementById("response").innerHTML = myobj.error.description;
+		return;
+	}
+	var qtable = document.getElementById("questiontable");
+	var qms = new Array();
+	qms = myobj;	// object to array
+	for(var i=0; i < qms.length; i++)
+	{
+		AddRowToQuestionsTable(i+1,qtable,qms[i]);
+	}
+
+	document.getElementById("addnewquestions").innerHTML = 
+	"<a href='#' onClick='AddnewQuestion("+qms.length+")'>Add another question to this game</a>";
+}
+
+/*
+ * Add Row To questions table for review
+ */
+function AddRowToQuestionsTable(i,qtable,question)
+{
+	var row = qtable.insertRow(i);
+    var col = row.insertCell(0);
+    col.innerHTML = i;
+    col = row.insertCell(1);
+	col.innerHTML = question.questionId;
+    col = row.insertCell(2);
+	col.innerHTML = question.category;
+    col = row.insertCell(3);
+	col.innerHTML = question.subCategory;
+    col = row.insertCell(4);
+	col.innerHTML = question.difficulty;
+    col = row.insertCell(5);
+	col.innerHTML = question.type;
+    col = row.insertCell(6);
+	col.innerHTML = question.question;
+    col = row.insertCell(7);
+	col.innerHTML = question.answer;
+    col = row.insertCell(8);
+	if(question.imageUrl == "")
+		txt = "n/a";
+	else
+		txt = "<a href='#' onClick=NewWin('"+HOST+question.imageUrl+"','image')><img src='icons/gpicture40.png'></a>"
+ 	col.innerHTML = txt;
+    col = row.insertCell(9);	
+	col.innerHTML = "<a href='#' onClick='ReplaceQuestion("+i+",\""+question.questionId+"\")'><img src='icons/answers40.png' title='Replace'></a>";
+    col = row.insertCell(10);
+    col.innerHTML = "<a href='#' onClick='DeleteQuestion("+i+",\""+question.questionId+"\")'><img src='icons/trash40.png' title='Delete'></a>";
+
+}
+
+/*
+ * Replace one of the questions with another and refresh table
+ */
+function ReplaceQuestion(qno, qid)
+{
+	document.getElementById("response").innerHTML = "";
+	var newqid = prompt("Please enter the new question id", "e.g. 19710730");
+	if(isNaN(newqid))
+	{
+		alert("invalid question id");
+		return;
+	}
+	if(!newqid)
+	{
+		return;
+	}
+	
+	var gameid = readCookie("QMGameID");
+	var response = doAjaxPut(GAME_URL+"/"+gameid+"/questions/"+qno, "questionid="+newqid);
+//	alert(response);
+	var myobj = JSON.parse(response);
+	if(myobj.error != null)		// there was an error response
+	{
+		console.log(myobj.error.message);
+		document.getElementById("response").innerHTML = myobj.error.description;
+		return;
+	}
+	
+	var qtable = document.getElementById("questiontable");
+	qtable.deleteRow(qno);
+	AddRowToQuestionsTable(qno,qtable,myobj);
+//	document.getElementById("response").innerHTML = response;
+}
+
+/*
+ * Add a new question to the game and refresh table
+ */
+function AddnewQuestion(numQuestions)
+{
+	document.getElementById("response").innerHTML = "";
+	var newqid = prompt("Please enter the question id of the question to add", "e.g. 19710730");
+	if(isNaN(newqid))
+	{
+		alert("invalid question id");
+		return;
+	}
+	if(!newqid)
+	{
+		return;
+	}
+	
+	var gameid = readCookie("QMGameID");
+	var response = doAjaxPost(GAME_URL+"/"+gameid+"/questions", "questionid="+newqid);
+//	alert(response);
+	var myobj = JSON.parse(response);
+	if(myobj.error != null)		// there was an error response
+	{
+		console.log(myobj.error.message);
+		document.getElementById("response").innerHTML = myobj.error.description;
+		return;
+	}
+	
+	var qtable = document.getElementById("questiontable");
+	AddRowToQuestionsTable(numQuestions+1,qtable,myobj);
+}
+
+/*
+ * Delete a question from game and refresh table
+ */
+function DeleteQuestion(qno, qid)
+{
+	document.getElementById("response").innerHTML = "";
+	var verify = confirm("Are you sure you want to delete this question from this game?");
+	if(verify == false)
+	{
+		return;
+	}
+	
+	var gameid = readCookie("QMGameID");
+	var response = doAjaxDelete(GAME_URL+"/"+gameid+"/questions/"+qno);
+//	alert(response);
+	var myobj = JSON.parse(response);
+	if(myobj.error != null)		// there was an error response
+	{
+		console.log(myobj.error.message);
+		document.getElementById("response").innerHTML = myobj.error.description;
+		return;
+	}
+	
+//	var qtable = document.getElementById("questiontable");
+//	qtable.deleteRow(qno);
+//	document.getElementById("response").innerHTML = myobj.success.description;
+
+	location.reload(true);
+}
