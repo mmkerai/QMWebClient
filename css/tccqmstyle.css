@@ -285,3 +285,13 @@ table#questiontable tr:nth-child(even) {
     background-color: orange;
 	color: red
 }
+
+#next 	{
+	font-size: 16px;
+	line-height: 20px;
+	color: blue;
+	}
+
+#next  a	{color: red}
+
+#next a:hover {color: purple}

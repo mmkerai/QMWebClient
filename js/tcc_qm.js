@@ -1,13 +1,13 @@
-//var HOST = "http://localhost:8888/";
-var HOST = "https://tcc-quizmaster.appspot.com/";
+var HOST = "http://localhost:8888/";
+//var HOST = "https://tcc-quizmaster.appspot.com/";
 var QM_URL = HOST + "apiv1/qm";
 var QMAUTH_URL = HOST + "apiv1/qmauth";
 var GAME_URL = HOST + "apiv1/qmgames";
 var QUESTION_URL = HOST + "apiv1/qmquestions/";
 var CONTESTANT_URL = HOST + "apiv1/qmcontestants";
-var APP_ID = "5642554087309312";	// tropical google id appengine
+//var APP_ID = "5642554087309312";	// tropical google id appengine
 //var APP_SECRET = "MmQwYjNkZTM5NDA3OWYxZTZmNzQ1OTkw";	// tropical google id appengine
-//var APP_ID = "5717460464435200";	// tropical facebook locahost
+var APP_ID = "5717460464435200";	// tropical facebook locahost
 //var APP_SECRET = "YTg1Mzg4YmVjMGE2MGRmYTkyN2NlZDBl";	// tropical facebook locahost
 var FINISH_FLAG = 0;
 var CURRENT_QUESTION = 0;
@@ -55,14 +55,8 @@ function GamePageSetup(gameid, gamename, htmlpage)
 function EditGamePage()
 {
 	var gameid = readCookie("QMGameID");
-	var response = doAjaxGet(GAME_URL+"/"+gameid);
-	var game = JSON.parse(response);
-	if(game.error != null)		// there was an error response
-	{
-		console.log(game.error.message);
-		document.getElementById("response").innerHTML = game.error.description;
-		return;
-	}
+	var url = GAME_URL+"/"+gameid;
+	if((game = doAjaxGetJSONObject(url)) == null) return;
 
 	document.getElementById("title").innerHTML = "Edit "+game.gameName;
 	var uform = document.getElementById("playgameform");
@@ -80,14 +74,7 @@ function EditGamePage()
 
 function GetMyGames()
 {
-	var response = doAjaxGet(GAME_URL);
-	var myobj = JSON.parse(response);
-	if(myobj.error != null)		// there was an error response
-	{
-		console.log(myobj.error.message);
-		document.getElementById("response").innerHTML = myobj.error.description;
-		return;
-	}
+	if((myobj = doAjaxGetJSONObject(GAME_URL)) == null) return;
 
 	var gamestable = CreateGamesTable();
 	PopulateGamesTable(myobj,gamestable);
@@ -134,14 +121,8 @@ function AddContestant()
 function ShowContestantsPage()
 {
 	var gameid = readCookie("QMGameID");
-	var response = doAjaxGet(GAME_URL+"/"+gameid+"/contestants");
-	var myobj = JSON.parse(response);
-	if(myobj.error != null)		// there was an error response
-	{
-		console.log(myobj.error.message);
-		document.getElementById("response").innerHTML = myobj.error.description;
-		return;
-	}
+	var url = GAME_URL+"/"+gameid+"/contestants";
+	if((myobj = doAjaxGetJSONObject(url)) == null) return;
 	var constable = document.getElementById("contestanttable");
 	var cons = new Array();
 	cons = myobj.contestants;
@@ -151,13 +132,13 @@ function ShowContestantsPage()
 	}
 }
 
-/*
+/************check this*************
  * Update the add contestant form with game details
  */
 function UpdateContestantForm()
 {
-	var response = doAjaxGet(GAME_URL+"/"+gameid+"/contestants");
-//	alert(response);	
+	var url = GAME_URL+"/"+gameid+"/contestants";
+	if((response = doAjaxGetJSONObject(url)) == null) return;
 	document.getElementById("response").innerHTML = response;
 //	contable = ConTableCreate();
 	var jsobj = JSON.parse(response);
@@ -237,7 +218,7 @@ function PopulateGamesTable(jsobj, gtable)
 	    var col8 = row.insertCell(6);
 	    col8.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"showcontestants.html\")'><img src='icons/contestants40.jpg' title='Manage contestants'/></a>";
 	    var col9 = row.insertCell(7);
-	    col9.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"reviewquestions.html\")'><img src='icons/questions40.png' title='Review questions'/></a>";
+	    col9.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"reviewgamequestions.html\")'><img src='icons/questions40.png' title='Review questions'/></a>";
 	    var col10 = row.insertCell(8);
 	    col10.innerHTML = "<a href='#' onClick='GamePageSetup("+games[cnt].gameId+",\""+games[cnt].gameName+"\",\"startgame.html\")'><img src='icons/start40.png' title='Start Game'/></a>";
 	    var col11 = row.insertCell(9);
@@ -597,15 +578,9 @@ function ShowScores()
 	var gname = readCookie("QMGameName");
 	document.getElementById("title").innerHTML = "Scores for Game: "+gname;
 
-	var response = doAjaxGet(GAME_URL+"/"+gameid+"/scores");
-	myobj = JSON.parse(response);
-	if(myobj.error != null)		// there was an error response
-	{
-//		console.log(myobj.error.message);
-		document.getElementById("response").innerHTML = myobj.error.description;
-		return;
-	}
-	
+	var url = GAME_URL+"/"+gameid+"/scores";
+	if((myobj = doAjaxGetJSONObject(url)) == null) return;
+
 	CreateQuestionTable(myobj);
 	CreateC2AnswerTable(myobj);
 }
@@ -737,12 +712,10 @@ function DisplayQuestion(myobj)
  */
 function SetupCategories()
 {
-	var response = doAjaxGet(QUESTION_URL);
-//	alert(response);
+	if((jsobj = doAjaxGetJSONObject(QUESTION_URL)) == null) return;
 	var catselect = document.getElementById("catoption");
 	var cats = new Array();
 	Scats = new Array();
-	var jsobj = JSON.parse(response);
 	cats = jsobj.categories;
 	var option;
 	cats.forEach(function (cat)
@@ -950,15 +923,9 @@ function Logout()
 function ShowGameQuestions()
 {
 	var gameid = readCookie("QMGameID");
-	var response = doAjaxGet(GAME_URL+"/"+gameid+"/questions");
-//	alert(response);
-	var myobj = JSON.parse(response);
-	if(myobj.error != null)		// there was an error response
-	{
-		console.log(myobj.error.message);
-		document.getElementById("response").innerHTML = myobj.error.description;
-		return;
-	}
+	var url = GAME_URL+"/"+gameid+"/questions";
+	if((myobj = doAjaxGetJSONObject(url)) == null) return;
+
 	var qtable = document.getElementById("questiontable");
 	var qms = new Array();
 	qms = myobj;	// object to array
@@ -973,6 +940,7 @@ function ShowGameQuestions()
 
 /*
  * Add Row To questions table for review
+ * used for review questions in a game
  */
 function AddRowToQuestionsTable(i,qtable,question)
 {
@@ -1100,4 +1068,35 @@ function DeleteQuestion(qno, qid)
 //	document.getElementById("response").innerHTML = myobj.success.description;
 
 	location.reload(true);
+}
+
+/*
+ * Update questions table during review
+ * used for reviewing all questions
+ */
+function UpdateQuestionsTable(i,qtable,question)
+{
+	var colnum = 0;
+	var row = qtable.insertRow(i);
+    var col = row.insertCell(colnum++);
+	col.innerHTML = question.questionId;
+    col = row.insertCell(colnum++);
+	col.innerHTML = question.category;
+    col = row.insertCell(colnum++);
+	col.innerHTML = question.subCategory;
+    col = row.insertCell(colnum++);
+	col.innerHTML = question.difficulty;
+    col = row.insertCell(colnum++);
+	col.innerHTML = question.type;
+    col = row.insertCell(colnum++);
+	col.innerHTML = question.question;
+    col = row.insertCell(colnum++);
+	col.innerHTML = question.answer;
+    col = row.insertCell(colnum++);
+	if(question.imageUrl == "")
+		txt = "n/a";
+	else
+		txt = "<a href='#' onClick=NewWin('"+HOST+question.imageUrl+"','image')><img src='icons/gpicture40.png'></a>"
+ 	col.innerHTML = txt;
+
 }

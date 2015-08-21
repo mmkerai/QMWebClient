@@ -46,10 +46,10 @@ function delCookie(name)
 
 function NewWin(htmlfile, name)		// open a new window
 {
-	WIDTH = 1000;
-	HEIGHT = 500;
+	WIDTH = 1200;
+	HEIGHT = 512;
 	var left = (screen.width/2)-(WIDTH/2);
-	var top = (screen.height/2)-(HEIGHT/2);
+	var top = (screen.height/2)-(HEIGHT/2)-64;
 	var winpop = window.open(htmlfile, name,
 				'toolbar=yes,location=no,status=no,menubar=yes,scrollbars=yes,resizable=yes,width='+WIDTH+',height='+HEIGHT+',top='+top+',left='+left);
 	winpop.focus();
@@ -211,8 +211,42 @@ function doAjaxGet(url)
 	{
 		alert("Ajax Get Error code: "+xmlhttp.status);
 	}
+	
 	return(response);
 }
+
+/*
+ * This function sends a HTTP GET to the url with a bearer token
+ * for Quizmaster
+ */
+function doAjaxGetJSONObject(url)
+{
+//	url = url + APP_ID;		// add the app id to the url as per API spec
+//	alert("URL is "+ url);
+	var token = getQMtoken();
+	xmlhttp = getAjaxCnx();
+	
+	xmlhttp.open("GET",url,false);
+	xmlhttp.setRequestHeader("Authorization","Bearer "+token);
+	xmlhttp.send();
+	var response = xmlhttp.response;
+	if(xmlhttp.status != 200)	// SC_OK codes
+	{
+		alert("Ajax Get Error code: "+xmlhttp.status);
+	}
+	
+//	alert(response);
+	var myobj = JSON.parse(response);
+	if(myobj.error != null)		// there was an error response
+	{
+		console.log(myobj.error.message);
+		document.getElementById("response").innerHTML = myobj.error.description;
+		return null;
+	}
+
+	return(myobj);
+}
+
 
 /*
  * This function sends a HTTP GET to the url with a bearer token
@@ -455,4 +489,15 @@ function CheckQMToken()
 		alert("Token is "+token);
 		window.location.assign("showgames.html");
 	}
+}
+
+/*
+ * Function gets url parameters 
+ */
+function getParameterByName(name) 
+{
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }

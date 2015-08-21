@@ -14,18 +14,16 @@
 <h1>Review Questions</h1>
 </div>
 <div id="response"></div>
-<form id="questionform">
-<table id="formtable">
-<tr><td>Category</td><td><select name="category" id="catoption" onchange="populateSubCat('catoption','scoption');"></select></td></tr>
-<tr><td>Subcategory</td><td><select name="subcategory" id="scoption" onclick="populateDiff('scoption','diffoption');"></select></td></tr>
-<tr><td>Difficulty</td><td><select name="difficulty" id="diffoption"></select></td></tr>
-<tr><td colspan="2"><a href="#" onClick="reviewquestions()">Review questions</a></td></tr>
+<p><div id="next"></div></p>
+<div id="questions">
+<table id="questiontable">
+<tr><th>Question Id</th><th>Category</th><th>Subcategory</th><th>Difficulty</th>
+	<th>Type</th><th>Question</th><th>Answer</th><th>Image</th></tr>
 </table>
-</form>
 <script>
-SetupCategories();
+showfirstquestions();
 </script>
-<p><a href="index.html">Back to Home Page</a></p>
 </div>
+<p><a href=# onClick='window.close()'>Close this window</a></p>
 </body>
 </html>
